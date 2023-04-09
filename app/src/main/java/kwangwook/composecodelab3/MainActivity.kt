@@ -4,13 +4,9 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.ElevatedButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -55,7 +51,23 @@ fun Greeting(name: String) {
 }
 
 @Composable
-fun MyApp(
+fun MyApp(modifier: Modifier = Modifier) {
+
+    // TODO: This state should be hoisted
+    // = 대신 by 키워드를 사용. 이 키워드는 매번 .value를 입력할 필요가 없도록 해주는 속성 위임.
+    var shouldShowOnBoarding by remember { mutableStateOf(true) }
+
+    Surface(modifier) {
+        if (shouldShowOnBoarding) {
+            OnBoardingScreen { shouldShowOnBoarding = false }
+        } else {
+            Greetings()
+        }
+    }
+}
+
+@Composable
+private fun Greetings(
     modifier: Modifier = Modifier,
     names: List<String> = listOf("Bitcoin", "Ethereum")
 ) {
@@ -66,10 +78,46 @@ fun MyApp(
     }
 }
 
+@Composable
+fun OnBoardingScreen(
+    modifier: Modifier = Modifier,
+    onContinueClicked: () -> Unit
+) {
+    Column(
+        modifier = modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text("Welcome to the Basics Codelab!")
+        Button(
+            modifier = Modifier.padding(vertical = 24.dp),
+            onClick = onContinueClicked
+        ) {
+            Text("Continue")
+        }
+    }
+}
+
 @Preview(showBackground = true, widthDp = 320)
 @Composable
-fun DefaultPreview() {
+private fun GreetingsPreview() {
     ComposeCodelab3Theme {
-        MyApp()
+        Greetings()
+    }
+}
+
+@Preview(showBackground = true, widthDp = 320, heightDp = 320)
+@Composable
+fun OnBoardingPreview() {
+    ComposeCodelab3Theme {
+        OnBoardingScreen {} // Do nothing on click.
+    }
+}
+
+@Preview
+@Composable
+fun MyAppPreview() {
+    ComposeCodelab3Theme {
+        MyApp(Modifier.fillMaxSize())
     }
 }
